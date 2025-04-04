@@ -4,9 +4,8 @@
         "skipLibCheck": true,
         "moduleResolution": "node16",
         "module": "Node16",
-        "baseUrl": "./",
-        "paths": { "$parser": ["src/parser"] },
-        "outDir": "dist"
+        "outDir": "dist",
+        "checkJs": true
     },
     "include": ["src/**/*.ts"]
 }

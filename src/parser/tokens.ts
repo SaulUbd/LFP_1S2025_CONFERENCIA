@@ -10,6 +10,7 @@ export enum TokenType {
     JUNGLA,
     WORLD,
     AT,
+    PLACE,
     CONNECT,
     TO,
     WITH,

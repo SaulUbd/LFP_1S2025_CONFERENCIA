@@ -1,0 +1,4 @@
+world "mundo prueba" {
+    place Lugar:cueva at (0,3)
+    place Lugar:jungla at (3,3)
+}

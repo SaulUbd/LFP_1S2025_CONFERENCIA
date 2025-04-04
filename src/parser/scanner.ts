@@ -1,9 +1,11 @@
 import { Token, TokenType, TokenType as tk } from './tokens.js';
+import { ParsingError } from './error.js';
 
 const reserved: { [key: string]: TokenType } = {
     world: tk.WORLD,
     at: tk.AT,
     connect: tk.CONNECT,
+    place: tk.PLACE,
     to: tk.TO,
     with: tk.WITH,
     playa: tk.PLAYA,
@@ -11,8 +13,14 @@ const reserved: { [key: string]: TokenType } = {
     jungla: tk.JUNGLA,
 };
 
+interface ScanResult {
+    errors: ParsingError[];
+    tokens: Token[];
+}
+
 export default class Scanner {
     tokens: Token[];
+    errors: ParsingError[];
     source: string;
     length: number;
     start: number;
@@ -22,6 +30,7 @@ export default class Scanner {
 
     constructor(source: string) {
         this.tokens = [];
+        this.errors = [];
         this.source = source;
         this.length = source.length;
         this.start = 0;
@@ -30,7 +39,7 @@ export default class Scanner {
         this.col = 1;
     }
 
-    scan(): Token[] {
+    scan(): ScanResult {
         while (!this.isAtEnd()) {
             const char = this.advance();
             switch (char) {
@@ -69,12 +78,14 @@ export default class Scanner {
                         this.identifier();
                     } else if (this.isNum(char)) {
                         this.number();
+                    } else {
+                        this.newError('Unexpected character ' + char);
                     }
                     break;
             }
         }
         this.newToken(tk.EOF);
-        return this.tokens;
+        return { errors: this.errors, tokens: this.tokens };
     }
 
     isAtEnd() {
@@ -127,5 +138,11 @@ export default class Scanner {
         );
         this.tokens.push(token);
         this.start = this.current;
+    }
+
+    newError(message: string) {
+        this.start = this.current;
+        const error = new ParsingError(this.row, this.col, message);
+        this.errors.push(error);
     }
 }

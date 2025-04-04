@@ -6,7 +6,7 @@ statement
     |   connect
 
 place
-    :   ID ":" placeType "at" "(" NUM "," NUM ")"
+    :   "place" ID ":" placeType "at" "(" NUM "," NUM ")"
 
 placeType
     :   "playa"
