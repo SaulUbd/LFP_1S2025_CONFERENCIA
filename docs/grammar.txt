@@ -1,0 +1,17 @@
+start
+    :   "world" STRING "{" statement+ "}"
+
+statement
+    :   place
+    |   connect
+
+place
+    :   ID ":" placeType "at" "(" NUM "," NUM ")"
+
+placeType
+    :   "playa"
+    |   "cueva"
+    |   "jungla"
+
+connect
+    :   "connect" ID "to" ID "with" STRING
