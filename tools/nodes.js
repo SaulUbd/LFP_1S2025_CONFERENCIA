@@ -16,7 +16,7 @@ const nodes = {
         statement: '(Place|Connect)',
     },
     place: {
-        id: 'string',
+        name: 'string',
         type: 'string',
         xCoord: 'string',
         yCoord: 'string',

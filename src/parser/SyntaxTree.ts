@@ -6,10 +6,12 @@ import IVisitor from './interfaces/Visitor.js';
 export class Start implements INode {
     name: string;
 	statements: Statement[];
+    dotId: number;
 
-    constructor(name: string, statements: Statement[]) {
+    constructor(dotId: number, name: string, statements: Statement[]) {
         this.name = name;
 		this.statements = statements;
+        this.dotId = dotId;
     }
 
     accept<T>(visitor: IVisitor<T>): T {
@@ -19,9 +21,11 @@ export class Start implements INode {
     
 export class Statement implements INode {
     statement: (Place|Connect);
+    dotId: number;
 
-    constructor(statement: (Place|Connect)) {
+    constructor(dotId: number, statement: (Place|Connect)) {
         this.statement = statement;
+        this.dotId = dotId;
     }
 
     accept<T>(visitor: IVisitor<T>): T {
@@ -30,16 +34,18 @@ export class Statement implements INode {
 }
     
 export class Place implements INode {
-    id: string;
+    name: string;
 	type: string;
 	xCoord: string;
 	yCoord: string;
+    dotId: number;
 
-    constructor(id: string, type: string, xCoord: string, yCoord: string) {
-        this.id = id;
+    constructor(dotId: number, name: string, type: string, xCoord: string, yCoord: string) {
+        this.name = name;
 		this.type = type;
 		this.xCoord = xCoord;
 		this.yCoord = yCoord;
+        this.dotId = dotId;
     }
 
     accept<T>(visitor: IVisitor<T>): T {
@@ -51,11 +57,13 @@ export class Connect implements INode {
     pointA: string;
 	pointB: string;
 	type: string;
+    dotId: number;
 
-    constructor(pointA: string, pointB: string, type: string) {
+    constructor(dotId: number, pointA: string, pointB: string, type: string) {
         this.pointA = pointA;
 		this.pointB = pointB;
 		this.type = type;
+        this.dotId = dotId;
     }
 
     accept<T>(visitor: IVisitor<T>): T {

@@ -46,9 +46,13 @@ for (const [name, args] of Object.entries(nodes)) {
     codeString += `
 export class ${getPascalCase(name)} implements INode {
     ${argKeys.map((arg) => `${arg}: ${args[arg]};`).join('\n\t')}
+    dotId: number;
 
-    constructor(${argKeys.map((arg) => `${arg}: ${args[arg]}`).join(', ')}) {
+    constructor(dotId: number, ${argKeys
+        .map((arg) => `${arg}: ${args[arg]}`)
+        .join(', ')}) {
         ${argKeys.map((arg) => `this.${arg} = ${arg};`).join('\n\t\t')}
+        this.dotId = dotId;
     }
 
     accept<T>(visitor: IVisitor<T>): T {

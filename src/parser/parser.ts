@@ -6,11 +6,13 @@ export default class Parser {
     tokens: Token[];
     errors: ParsingError[];
     current: number;
+    dotId: number;
 
     constructor(tokens: Token[]) {
         this.tokens = tokens;
         this.errors = [];
         this.current = 0;
+        this.dotId = 1;
     }
 
     parse() {
@@ -39,7 +41,7 @@ export default class Parser {
             if (stmt) stmts.push(stmt);
         }
         this.consume(tk.RBRACKET, '"}"');
-        return new Start(id.getText().replaceAll('"', ''), stmts);
+        return new Start(this.dotId++, id.getText().replaceAll('"', ''), stmts);
     }
 
     // RULES
@@ -49,8 +51,10 @@ export default class Parser {
      */
     private statement(): Statement | null {
         try {
-            if (this.check(tk.PLACE)) return new Statement(this.place());
-            if (this.check(tk.CONNECT)) return new Statement(this.connect());
+            if (this.check(tk.PLACE))
+                return new Statement(this.dotId++, this.place());
+            if (this.check(tk.CONNECT))
+                return new Statement(this.dotId++, this.connect());
             throw this.error(`"place" or "connect"`);
         } catch (error) {
             this.sync();
@@ -73,6 +77,7 @@ export default class Parser {
         const yCoord = this.consume(tk.NUM, 'Number');
         this.consume(tk.RPAREN, '")"');
         return new Place(
+            this.dotId++,
             id.getText(),
             pType.getText(),
             xCoord.getText(),
@@ -97,6 +102,7 @@ export default class Parser {
         this.consume(tk.WITH, '"with"');
         const road = this.consume(tk.STRING, 'String');
         return new Connect(
+            this.dotId++,
             pointA.getText(),
             pointB.getText(),
             road.getText().replaceAll('"', '')
