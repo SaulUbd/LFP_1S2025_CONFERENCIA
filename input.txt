@@ -1,4 +1,6 @@
 world "mundo prueba" {
-    place Lugar:cueva at (0,3)
-    place Lugar:jungla at (3,3)
+    place LugarA:cueva at (0,3)
+    place LugarB:jungla at (3,3)
+
+    connect LugarA to LugarB with "camino"
 }
