@@ -14,10 +14,14 @@ export default class Parser {
     }
 
     parse() {
+        const result: { errors: ParsingError[]; parseTree?: Start } = {
+            errors: this.errors,
+        };
         try {
-            return this.start();
+            result.parseTree = this.start();
+            return result;
         } catch (error) {
-            return this.errors;
+            return result;
         }
     }
 
@@ -25,16 +29,16 @@ export default class Parser {
      * start:  "world" STRING "{" statement+ "}"
      */
     private start(): Start {
-        this.consume(tk.WORLD, 'expected "world"');
-        this.consume(tk.STRING, 'expected String');
+        this.consume(tk.WORLD, '"world"');
+        this.consume(tk.STRING, 'String');
         const id = this.previous();
-        this.consume(tk.LBRACKET, 'expected "{"');
+        this.consume(tk.LBRACKET, '"{"');
         const stmts: Statement[] = [];
         while (!this.check(tk.RBRACKET) && !this.isAtEnd()) {
             const stmt = this.statement();
             if (stmt) stmts.push(stmt);
         }
-        this.consume(tk.RBRACKET, 'expected "}"');
+        this.consume(tk.RBRACKET, '"}"');
         return new Start(id.getText().replaceAll('"', ''), stmts);
     }
 
@@ -47,7 +51,7 @@ export default class Parser {
         try {
             if (this.check(tk.PLACE)) return new Statement(this.place());
             if (this.check(tk.CONNECT)) return new Statement(this.connect());
-            throw this.error(`exptected "place" or "connect"`);
+            throw this.error(`"place" or "connect"`);
         } catch (error) {
             this.sync();
             return null;
@@ -58,16 +62,16 @@ export default class Parser {
      * place:   "place" ID ":" placeType "at" "(" NUM "," NUM ")"
      */
     private place(): Place {
-        this.consume(tk.PLACE, 'expected "place"');
-        const id = this.consume(tk.ID, 'exptected Identifier');
-        this.consume(tk.COLON, 'expected :');
+        this.consume(tk.PLACE, '"place"');
+        const id = this.consume(tk.ID, 'Identifier');
+        this.consume(tk.COLON, '":"');
         const pType = this.placeType();
-        this.consume(tk.AT, 'expected "at"');
-        this.consume(tk.LPAREN, 'expected "("');
-        const xCoord = this.consume(tk.NUM, 'expected Number');
-        this.consume(tk.COMMA, 'expected ","');
-        const yCoord = this.consume(tk.NUM, 'expected Number');
-        this.consume(tk.RPAREN, 'expected ")"');
+        this.consume(tk.AT, '"at"');
+        this.consume(tk.LPAREN, '"("');
+        const xCoord = this.consume(tk.NUM, 'Number');
+        this.consume(tk.COMMA, '","');
+        const yCoord = this.consume(tk.NUM, 'Number');
+        this.consume(tk.RPAREN, '")"');
         return new Place(
             id.getText(),
             pType.getText(),
@@ -78,7 +82,7 @@ export default class Parser {
 
     private placeType(): Token {
         if (!this.match(tk.JUNGLA, tk.CUEVA, tk.PLAYA))
-            throw this.error('expected valid place');
+            throw this.error('valid place');
         return this.previous();
     }
 
@@ -86,12 +90,12 @@ export default class Parser {
      * connect: "connect" ID "to" ID "with" STRING
      */
     private connect(): Connect {
-        this.consume(tk.CONNECT, 'expected "connect"');
-        const pointA = this.consume(tk.ID, 'exptected Identifier');
-        this.consume(tk.TO, 'expected "to"');
-        const pointB = this.consume(tk.ID, 'exptected Identifier');
-        this.consume(tk.WITH, 'expected "with"');
-        const road = this.consume(tk.STRING, 'expected String');
+        this.consume(tk.CONNECT, '"connect"');
+        const pointA = this.consume(tk.ID, 'Identifier');
+        this.consume(tk.TO, '"to"');
+        const pointB = this.consume(tk.ID, 'Identifier');
+        this.consume(tk.WITH, '"with"');
+        const road = this.consume(tk.STRING, 'String');
         return new Connect(
             pointA.getText(),
             pointB.getText(),
@@ -120,8 +124,11 @@ export default class Parser {
         }
     }
 
-    private error(message: string) {
+    private error(expectedStr: string) {
         const token = this.peek();
+        const message = `expected ${expectedStr} but found ${
+            token.type === tk.EOF ? 'EOF' : token.getText()
+        }`;
         this.errors.push(new ParsingError(token.row, token.col, message));
         return new ParseError();
     }
@@ -132,9 +139,9 @@ export default class Parser {
      * @returns The last consumed token
      * @throws {ParseError}
      */
-    private consume(type: TokenType, errMsg: string): Token {
+    private consume(type: TokenType, expectedStr: string): Token {
         if (this.check(type)) return this.advance();
-        throw this.error(errMsg);
+        throw this.error(expectedStr);
     }
 
     /**
