@@ -36,7 +36,7 @@ export default class Scanner {
         this.start = 0;
         this.current = 0;
         this.row = 1;
-        this.col = 1;
+        this.col = 0;
     }
 
     scan(): ScanResult {
@@ -67,11 +67,10 @@ export default class Scanner {
                 case '\n':
                 case '\r':
                     this.row++;
-                    this.col = 1;
+                    this.col = 0;
                     break;
                 case '\t':
                 case ' ':
-                    this.col++;
                     break;
                 default:
                     if (this.isAlpha(char)) {
@@ -95,7 +94,7 @@ export default class Scanner {
     identifier() {
         while (this.isAlpha(this.peek())) this.advance();
         let tokenType = tk.ID;
-        const id = this.source.substring(this.start, this.current);
+        const id = this.source.substring(this.start, this.current).trim();
         if (id in reserved) tokenType = reserved[id];
         this.newToken(tokenType);
     }
